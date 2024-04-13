@@ -4,6 +4,8 @@ SRCS_PATH = srcs
 OBJ_PATH = objs
 
 SOURCES =	main.c \
+			parsing.c \
+			display.c \
 
 SRC = $(addprefix $(SRC_PATH)/,$(SOURCES))
 OBJ = $(addprefix $(OBJ_PATH)/,$(SOURCES:.c=.o))
