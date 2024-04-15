@@ -6,6 +6,49 @@ void exit_error(char *message) {
     exit(EXIT_FAILURE);
 }
 
+struct addrinfo *get_addrinfo(char *ip)
+{
+	struct addrinfo 	hints;
+    struct addrinfo 	*result;
+
+	ft_memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_RAW;
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_protocol = IPPROTO_ICMP;
+	int status = getaddrinfo(ip, NULL, &hints, &result);
+    if (status != 0) {
+        fprintf(stderr, "ft_malcolm: unknow host or invalid IP address: (%s).", ip);
+        exit_error("");
+    }
+    return result;
+}
+
+
+void	get_ipstr(char* ip_buffer, struct sockaddr_in* sockaddr) {
+    if (sockaddr->sin_family == AF_INET)
+    {
+        struct sockaddr_in *ipv4 = (struct sockaddr_in *)sockaddr;
+        inet_ntop(AF_INET, &(ipv4->sin_addr), ip_buffer, INET_ADDRSTRLEN);
+    }
+    else
+        exit_error("ft_malcolm: Invalid IP address");
+}
+
+
+void parse_ip_address(char *ip_src, char *ip_target) {
+    g_data.result_src = get_addrinfo(ip_src);
+    g_data.result_target = get_addrinfo(ip_target);
+    g_data.sockaddr_src = (struct sockaddr_in *)g_data.result_src->ai_addr;
+    g_data.sockaddr_target = (struct sockaddr_in *)g_data.result_target->ai_addr;
+    g_data.ip_src = g_data.sockaddr_src->sin_addr.s_addr;
+    g_data.ip_target = g_data.sockaddr_target->sin_addr.s_addr;
+    get_ipstr(g_data.ip_src_str, g_data.sockaddr_src);
+    get_ipstr(g_data.ip_target_str, g_data.sockaddr_target);
+
+}
+
+
 static _Bool is_valid_hex(char c) {
     return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'));
 }
