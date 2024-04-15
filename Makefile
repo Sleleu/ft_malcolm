@@ -38,4 +38,10 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+up:
+	vagrant up --provider libvirt
+
+destroy:
+	vagrant destroy sender target -f
+
+.PHONY: all clean fclean re destroy

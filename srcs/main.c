@@ -47,7 +47,7 @@ t_arp_hdr create_arp_packet(char **argv) {
 
     if (!inet_pton(AF_INET, argv[IP_SRC], &packet.ip_src)
         || !inet_pton(AF_INET, argv[IP_TARGET], &packet.ip_target))
-            exit_error("Invalid IP address format");
+            exit_error("ft_malcolm: Invalid IP address format");
 
     for (int i = 0; i < ETHERNET_ADDR_LEN; i++) {
         packet.mac_src[i] = g_data.mac_src[i];

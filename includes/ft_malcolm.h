@@ -34,7 +34,7 @@
 #define REQUEST 0x0001
 #define REPLY 0x0002
 
-#define INTERFACE "enp3s0"
+#define INTERFACE "eth0"
 #define STR_MAC_LEN 17
 
 /* ETHERNET HEADER */
