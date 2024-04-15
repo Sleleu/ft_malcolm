@@ -15,16 +15,6 @@ void print_ip_address(u_int32_t ip) {
     printf("%s\n", str);
 }
 
-void	get_ipstr(char* ip_buffer) {
-    if (g_data.sockaddr->sin_family == AF_INET)
-    {
-        struct sockaddr_in *ipv4 = (struct sockaddr_in *)g_data.sockaddr;
-        inet_ntop(AF_INET, &(ipv4->sin_addr), ip_buffer, INET_ADDRSTRLEN);
-    }
-    else
-        exit_error("ft_malcolm: Invalid IP address");
-}
-
 void print_packet(t_arp_hdr packet) {
     printf("----- ARP HEADER -----\n");
     printf("TOTAL size: 28 bytes\n");

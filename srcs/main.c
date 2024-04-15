@@ -5,8 +5,10 @@ t_data g_data;
 void free_data(void) {
     if (g_data.sockfd != -1)
         close(g_data.sockfd);
-    if (g_data.result != NULL)
-        freeaddrinfo(g_data.result);
+    if (g_data.result_src != NULL)
+        freeaddrinfo(g_data.result_src);
+    if (g_data.result_target != NULL)
+        freeaddrinfo(g_data.result_target);
 }
 
 void signal_handler(int signal) {
@@ -17,7 +19,7 @@ void signal_handler(int signal) {
     }
 }
 
-void init_sockaddr(char *ip_target)
+struct addrinfo *get_addrinfo(char *ip)
 {
 	struct addrinfo 	hints;
     struct addrinfo 	*result;
@@ -27,13 +29,12 @@ void init_sockaddr(char *ip_target)
 	hints.ai_socktype = SOCK_RAW;
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_protocol = IPPROTO_ICMP;
-	int status = getaddrinfo(ip_target, NULL, &hints, &result);
+	int status = getaddrinfo(ip, NULL, &hints, &result);
     if (status != 0) {
-        fprintf(stderr, "ft_malcolm: unknow host or invalid IP address: (%s).\n", ip_target);
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "ft_malcolm: unknow host or invalid IP address: (%s).", ip);
+        exit_error("");
     }
-    g_data.result = result;
-    g_data.sockaddr = (struct sockaddr_in *)result->ai_addr;
+    return result;
 }
 
 
@@ -68,10 +69,34 @@ int     init_socket(void)
 
 void  check_interface(void) {
     struct ifreq ifr;
-    strncpy(ifr.ifr_name, INTERFACE, IFNAMSIZ);
+    ft_strlcpy(ifr.ifr_name, INTERFACE, IFNAMSIZ + 1);
     if (ioctl(g_data.sockfd, SIOCGIFINDEX, &ifr) == -1)
         exit_error("ft_malcolm: no such interface");
     printf("Found available interface: %s\n", ifr.ifr_name);
+}
+
+void	get_ipstr(char* ip_buffer, struct sockaddr_in* sockaddr) {
+    if (sockaddr->sin_family == AF_INET)
+    {
+        struct sockaddr_in *ipv4 = (struct sockaddr_in *)sockaddr;
+        inet_ntop(AF_INET, &(ipv4->sin_addr), ip_buffer, INET_ADDRSTRLEN);
+    }
+    else
+        exit_error("ft_malcolm: Invalid IP address");
+}
+
+
+void parse_ip_address(char *ip_src, char *ip_target) {
+    g_data.result_src = get_addrinfo(ip_src);
+    g_data.result_target = get_addrinfo(ip_target);
+    g_data.sockaddr_src = (struct sockaddr_in *)g_data.result_src->ai_addr;
+    g_data.sockaddr_target = (struct sockaddr_in *)g_data.result_target->ai_addr;
+    g_data.ip_src = g_data.sockaddr_src->sin_addr.s_addr;
+    g_data.ip_target = g_data.sockaddr_target->sin_addr.s_addr;
+    
+    get_ipstr(g_data.ip_src_str, g_data.sockaddr_src);
+    get_ipstr(g_data.ip_target_str, g_data.sockaddr_target);
+
 }
 
 int main(int argc, char **argv) {
@@ -82,10 +107,14 @@ int main(int argc, char **argv) {
 
     parse_mac_address(argv[MAC_SRC]);
     parse_mac_address(argv[MAC_TARGET]);
+    parse_ip_address(argv[IP_SRC], argv[IP_TARGET]);
+
+    printf("g_data SRC : %s\n", g_data.ip_src_str);
+    printf("g_data TARGET : %s\n", g_data.ip_target_str);
+    printf("g_data SRC decimal %u\n", g_data.ip_src);
+    printf("g_data TARGET decimal %u\n", g_data.ip_target);
 
     signal(SIGINT, signal_handler);
-
-    init_sockaddr(argv[IP_TARGET]);
     g_data.sockfd = init_socket();
     check_interface();
 

@@ -67,10 +67,16 @@ typedef struct s_arp_packet {
 typedef struct s_data
 {
 	int					sockfd;
-	struct addrinfo		*result;
-	struct sockaddr_in	*sockaddr;
+	struct addrinfo		*result_src;
+    struct addrinfo     *result_target;
+	struct sockaddr_in	*sockaddr_src;
+    struct sockaddr_in  *sockaddr_target;
     u_int8_t            mac_src[ETHERNET_ADDR_LEN];
     u_int8_t            mac_target[ETHERNET_ADDR_LEN];
+    char                ip_src_str[INET_ADDRSTRLEN];
+    char                ip_target_str[INET_ADDRSTRLEN];
+    u_int32_t           ip_src;
+    u_int32_t           ip_target;
 }	t_data;
 
 extern t_data g_data;
