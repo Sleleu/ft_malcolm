@@ -58,7 +58,7 @@ void print_packet(t_arp_hdr packet) {
     print_mac_address(packet.mac_src);
     printf("sender protocol address: ");
     print_ip_address(packet.ip_src);
-    printf("sender hardware address: ");
+    printf("target hardware address: ");
     print_mac_address(packet.mac_target);
     printf("target protocol address: ");
     print_ip_address(packet.ip_target);

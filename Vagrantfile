@@ -17,5 +17,6 @@ Vagrant.configure("2") do |config|
         target.vm.hostname = "target"
         target.vm.network "private_network", ip: "192.168.56.111"
         target.vm.provision "shell", path: "scripts/install.sh"
+        target.vm.provision "shell", path: "scripts/target.sh"
     end
 end

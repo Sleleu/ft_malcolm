@@ -59,9 +59,22 @@ typedef struct s_arp_hdr {
 } t_arp_hdr;
 
 /* ARP PACKET */
-typedef struct s_arp_packet {
-    t_eth_hdr eth_hdr;
-    t_arp_hdr arp_hdr;
+typedef struct __attribute__((packed)) s_arp_packet {
+    /* ETHERNET HEADER */
+	u_int8_t	h_target[ETH_ALEN];
+	u_int8_t    h_src[ETH_ALEN];
+	u_int16_t   h_proto;
+
+    /* ARP HEADER */
+    u_int16_t   hardware_type;
+    u_int16_t   proto_type;
+    u_int8_t hardware_addr_len;
+    u_int8_t proto_addr_len;
+    u_int16_t operation; // request or reply
+    u_int8_t mac_src[ETHERNET_ADDR_LEN];
+    u_int32_t ip_src;
+    u_int8_t mac_target[ETHERNET_ADDR_LEN];
+    u_int32_t ip_target;
 } t_arp_packet;
 
 
