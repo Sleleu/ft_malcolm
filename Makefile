@@ -6,6 +6,7 @@ OBJ_PATH = objs
 SOURCES =	main.c \
 			parsing.c \
 			display.c \
+			handle_packet.c
 
 SRC = $(addprefix $(SRC_PATH)/,$(SOURCES))
 OBJ = $(addprefix $(OBJ_PATH)/,$(SOURCES:.c=.o))

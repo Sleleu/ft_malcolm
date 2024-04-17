@@ -16,7 +16,7 @@
 #include <linux/if_ether.h>
 #include <linux/if_arp.h>
 #include <ifaddrs.h>
-#include "../libft/libft.h" 
+#include "../libft/libft.h"
 
 #define IP_SRC 1
 #define MAC_SRC 2
@@ -31,6 +31,15 @@
 #define REPLY 0x0002
 #define INTERFACE "eth0"
 #define STR_MAC_LEN 17
+
+#define RED "\e[1;31m"
+#define GREEN "\e[1;32m"
+#define YELLOW "\e[1;33m"
+#define BLUE "\e[1;34m"
+#define PURPLE "\e[1;35m"
+#define CYAN "\e[1;36m"
+#define WHITE "\e[1;37m"
+#define END "\e[0m"
 
 
 /* ARP PACKET */
@@ -86,5 +95,10 @@ void        print_packet(t_arp_packet packet);
 
 /* Main */
 void free_data(void);
+
+/* Handle_packet */
+void create_socket_address(struct sockaddr_ll *socket_address, uint8_t *mac_target, int ifindex);
+void create_arp_packet(t_arp_packet *packet, char **argv);
+_Bool receive_arp_request(void);
 
 #endif
