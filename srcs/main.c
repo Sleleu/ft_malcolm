@@ -48,13 +48,32 @@ int  get_interface(void) {
     return exit_error(""), -1;
 }
 
-
+bool parse_option(char **argv) {
+    for (int i = 5; argv[i] != NULL; i++) {
+        if (argv[i][0] == '-')
+        {
+            for (int j = 1; argv[i][j]; j++) {
+                if (argv[i][j] == 'v')
+                    g_data.verbose = true;
+                else if (argv[i][j] == 'f')
+                    g_data.flood = true;
+                else
+                    return false;
+            }
+        }
+        else
+            return false;
+    }
+    return true;
+}
 
 int main(int argc, char **argv) {
     if (getuid() != 0)
         exit_error("ft_malcolm: Operation not permitted");
-    if (argc != 5)
-        exit_error("ft_malcolm: usage: <IP-src> <MAC-src> <IP-target> <MAC-target>");
+    if (argc < 5)
+        exit_error("ft_malcolm: usage: <IP-src> <MAC-src> <IP-target> <MAC-target> [OPTION -v -f]");
+    if (argc != 5 && !parse_option(argv))
+        exit_error("ft_malcolm: usage: <IP-src> <MAC-src> <IP-target> <MAC-target> [OPTION -v -f]");
     signal(SIGINT, signal_handler);
 
     parse_mac_address(argv[MAC_SRC]);
@@ -71,17 +90,20 @@ int main(int argc, char **argv) {
     create_arp_packet(&packet, argv);
     struct sockaddr_ll socket_address;
     create_socket_address(&socket_address, g_data.mac_target, ifindex);
-    print_packet(packet);
-    while (42) {
-        if (receive_arp_request()) {
-            printf("Now sending an ARP reply to the target address with spoofed source, please wait...\n");
-            ssize_t bytes_sent = sendto(g_data.sockfd, &packet, sizeof(t_arp_packet), 0,
-                                (struct sockaddr *)&socket_address, sizeof(struct sockaddr_ll));
-            if (bytes_sent <= 0)
-                exit_error("ft_malcolm: sendto() failed");
-            printf("Sent an ARP reply packet, you may now check the arp table on the target.\n");
+    if (g_data.verbose)
+        print_packet(packet);
+    if (g_data.flood)
+        flood_packet(&packet, socket_address);
+    else
+        while (42) {
+            if (receive_arp_request()) {
+                printf("Now sending an ARP reply to the target address with spoofed source, please wait...\n");
+                send_arp_packet(&packet, socket_address);
+                if (g_data.verbose)
+                    print_packet(packet);
+                printf("Sent an ARP reply packet, you may now check the arp table on the target.\n");
+            }
         }
-    }
     free_data();
     return (EXIT_SUCCESS);
 }

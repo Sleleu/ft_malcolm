@@ -1,5 +1,23 @@
 #include "../includes/ft_malcolm.h"
 
+void send_arp_packet(t_arp_packet *packet, struct sockaddr_ll socket_address) {
+    ssize_t bytes_sent = sendto(g_data.sockfd, packet, sizeof(t_arp_packet), 0,
+                        (struct sockaddr *)&socket_address, sizeof(struct sockaddr_ll));
+    if (bytes_sent <= 0)
+        exit_error("ft_malcolm: sendto() failed"); 
+}
+
+void flood_packet(t_arp_packet *packet, struct sockaddr_ll socket_address) {
+    for (int i = 0; ; i++) {
+        printf("Preparing to send ARP reply to the target, please wait...\n");
+        send_arp_packet(packet, socket_address);
+        if (g_data.verbose)
+            print_packet(*packet);
+        printf("Sent ARP reply packet %d\n", i);
+        sleep(1);
+    }
+}
+
 void create_socket_address(struct sockaddr_ll *socket_address, uint8_t *mac_target, int ifindex) {
     ft_memset(socket_address, 0, sizeof(struct sockaddr_ll));
     socket_address->sll_family = AF_PACKET;
@@ -36,7 +54,7 @@ void create_arp_packet(t_arp_packet *packet, char **argv) {
     memcpy(packet->mac_target, g_data.mac_target, ETH_ALEN);
 }
 
-_Bool receive_arp_request(void) {
+bool receive_arp_request(void) {
     t_arp_packet recv_packet;
     struct sockaddr_ll recv_addr;
     socklen_t addr_len = sizeof(recv_addr);
@@ -45,15 +63,17 @@ _Bool receive_arp_request(void) {
                                       (struct sockaddr *)&recv_addr, &addr_len);
     if (bytes_received <= 0) {
         perror("recvfrom() failed");
-        return 0;
+        return false;
     }
 
     if (ntohs(recv_packet.operation) == REQUEST &&
         ntohs(recv_packet.proto_type) == IPV4_TYPE &&
         ntohs(recv_packet.hardware_type) == ETHERNET_10MB &&
-        memcmp(&recv_packet.ip_src, &g_data.ip_target, sizeof(recv_packet.ip_target)) == 0) {
+        ft_memcmp(&recv_packet.ip_src, &g_data.ip_target, sizeof(recv_packet.ip_target)) == 0) {
         printf("Received ARP request for target IP\n");
-        return 1;
+        if (g_data.verbose)
+            print_packet(recv_packet);
+        return true;
     }
-    return 0;
+    return false;
 }

@@ -55,7 +55,7 @@ void print_packet(t_arp_packet packet) {
     printf("| Hardware type: 0x%04X      | Protocol type: "BLUE"IPV4 (0x%04X)"WHITE"\n", ntohs(packet.hardware_type), ntohs(packet.proto_type));
     printf("| Hardware address len: "RED"0x%02X"WHITE" | Protocol address len: "RED"0x%02X"WHITE"\n", packet.hardware_addr_len, packet.proto_addr_len);
     if (ntohs(packet.operation) == REQUEST)
-        printf("| Operation: REQUEST (0x%04X)\n", ntohs(packet.operation));
+        printf("| Operation: "CYAN"REQUEST (0x%04X)"WHITE"\n", ntohs(packet.operation));
     else
         printf("| Operation: "CYAN"REPLY (0x%04X)"WHITE"\n", ntohs(packet.operation));
     printf("| Sender hardware address: ");

@@ -16,6 +16,7 @@
 #include <linux/if_ether.h>
 #include <linux/if_arp.h>
 #include <ifaddrs.h>
+#include <stdbool.h>
 #include "../libft/libft.h"
 
 #define IP_SRC 1
@@ -75,6 +76,8 @@ typedef struct s_data
     char                ip_target_str[INET_ADDRSTRLEN];
     u_int32_t           ip_src;
     u_int32_t           ip_target;
+    bool                verbose;
+    bool                flood;
 }	t_data;
 
 extern t_data g_data;
@@ -97,6 +100,8 @@ void        print_packet(t_arp_packet packet);
 void free_data(void);
 
 /* Handle_packet */
+void send_arp_packet(t_arp_packet *packet, struct sockaddr_ll socket_address);
+void flood_packet(t_arp_packet *packet, struct sockaddr_ll socket_address);
 void create_socket_address(struct sockaddr_ll *socket_address, uint8_t *mac_target, int ifindex);
 void create_arp_packet(t_arp_packet *packet, char **argv);
 _Bool receive_arp_request(void);
