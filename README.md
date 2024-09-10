@@ -1,5 +1,7 @@
 ## About the project
 
+*DISCLAIMER: This project is for educational purposes only.*
+
 The goal of this project is to implement an ARP spoofing tool in C. 
 The program intercepts ARP requests from a target and sends a spoofed ARP reply, associating a fake IP address with a specific MAC address. 
 This helps in understanding how the ARP protocol works at the network layer and how it can be exploited for network attacks.
