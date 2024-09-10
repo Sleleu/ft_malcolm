@@ -21,13 +21,19 @@ Despite its importance, ARP is inherently vulnerable due to its lack of authenti
 
 ### Structure of an ARP Packet
 
+ARP Packet is consists of **Ethernet Frame Header** and **ARP Header**. The length of the Ethernet Frame Header is 14 bytes, and 28 bytes for ARP Header.
+
+![arp-packet-format-ipcisco](https://github.com/user-attachments/assets/8cadf049-8efb-438c-8042-21e32c9a87c3)\
+*Source: [IPCisco: Address Resolution Protocol (ARP)](https://ipcisco.com/lesson/address-resolution-protocol-arp/)*
+
+
 Here is the structure I created to send and receive ARP packets for this project:
 
 ```C
 /* ARP PACKET */
 typedef struct __attribute__((packed)) s_arp_packet {
     /* ETHERNET HEADER */
-	u_int8_t	h_target[ETH_ALEN];
+	u_int8_t    h_target[ETH_ALEN];
 	u_int8_t    h_src[ETH_ALEN];
 	u_int16_t   h_proto;
 
